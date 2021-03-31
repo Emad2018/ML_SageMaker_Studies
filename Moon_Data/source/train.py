@@ -102,13 +102,13 @@ def save_model(model, model_dir):
     # save state dictionary
     torch.save(model.cpu().state_dict(), path)
     
-def save_model_params(model, model_dir):
+def save_model_params(model, model_dir,input_dim,hidden_dim,output_dim):
     model_info_path = os.path.join(args.model_dir, 'model_info.pth')
     with open(model_info_path, 'wb') as f:
         model_info = {
-            'input_dim': args.input_dim,
-            'hidden_dim': args.hidden_dim,
-            'output_dim': args.output_dim
+            'input_dim': input_dim,
+            'hidden_dim': hidden_dim,
+            'output_dim': output_dim
         }
         torch.save(model_info, f)
 
@@ -140,11 +140,16 @@ if __name__ == '__main__':
   
     ## TODO: Add args for the three model parameters: input_dim, hidden_dim, output_dim
     # Model parameters
-
-    
+    parser.add_argument('--input_dim', type=int, default=2,
+                        help='input dim size for training (default: 2)')
+    parser.add_argument('--hidden_dim',type=str,default="10,2", 
+                        help='hidden_dim to train (default: [2])')
+    parser.add_argument('--output_dim', type=int, default=1,
+                        help='output_dim  to train(default: 1)')
+   
     args = parser.parse_args()
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu") 
     
     # set the seed for generating random numbers
     torch.manual_seed(args.seed)
@@ -158,14 +163,18 @@ if __name__ == '__main__':
     ## TODO:  Build the model by passing in the input params
     # To get params from the parser, call args.argument_name, ex. args.epochs or ards.hidden_dim
     # Don't forget to move your model .to(device) to move to GPU , if appropriate
-    model = SimpleNet(input_dim=2, hidden_dim=[2], output_dim=1).to(device)
+    hidden_dim_str=args.hidden_dim.split(",")
+    hidden_dim=[]
+    for num in hidden_dim_str:
+        hidden_dim.append(int(num))
+    model = SimpleNet(input_dim=args.input_dim, hidden_dim=hidden_dim, output_dim=args.output_dim).to(device)
     
     # Given: save the parameters used to construct the model
-    save_model_params(model, args.model_dir)
+    save_model_params(model, args.model_dir,args.input_dim,hidden_dim,args.output_dim)
 
     ## TODO: Define an optimizer and loss function for training
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
-    criterion = nn.NLLLoss()
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    criterion = nn.BCELoss()
 
     
     # Trains the model (given line of code, which calls the above training function)

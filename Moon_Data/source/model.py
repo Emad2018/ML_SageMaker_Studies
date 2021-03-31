@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import numpy as np
 ## TODO: Complete this classifier
 class SimpleNet(nn.Module):
     
@@ -34,9 +34,5 @@ class SimpleNet(nn.Module):
         
         for linear in self.hidden_layers:
             x = F.relu(linear(x))
-            x = self.dropout(x)
-        
-        x = self.output(x)
-        x=self.output_sig(x)
-        
-        return x
+             
+        return self.output_sig(self.output(x))
