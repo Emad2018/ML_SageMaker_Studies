@@ -158,14 +158,14 @@ if __name__ == '__main__':
     ## TODO:  Build the model by passing in the input params
     # To get params from the parser, call args.argument_name, ex. args.epochs or ards.hidden_dim
     # Don't forget to move your model .to(device) to move to GPU , if appropriate
-    model = None
+    model = SimpleNet(input_dim=2, hidden_dim=[2], output_dim=1).to(device)
     
     # Given: save the parameters used to construct the model
     save_model_params(model, args.model_dir)
 
     ## TODO: Define an optimizer and loss function for training
-    optimizer = None
-    criterion = None
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    criterion = nn.NLLLoss()
 
     
     # Trains the model (given line of code, which calls the above training function)
